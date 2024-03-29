@@ -571,7 +571,8 @@ class Jupiter():
         only_direct_routes: bool=False,
         as_legacy_transaction: bool=False,
         exclude_dexes: list=None,
-        max_accounts: int=None
+        max_accounts: int=None,
+        playform_fees: int=None,
     ) -> dict:
         """Get the best swap route for a token trade pair sorted by largest output token amount from https://quote-api.jup.ag/v6/quote
         
@@ -616,7 +617,7 @@ class Jupiter():
                 'timeTaken': 0.069434356}
         """
         
-        quote_url = self.ENDPOINT_APIS_URL['QUOTE'] + "inputMint=" + input_mint + "&outputMint=" + output_mint + "&amount=" + str(amount) + "&swapMode=" + swap_mode + "&onlyDirectRoutes=" + str(only_direct_routes).lower() + "&asLegacyTransaction=" + str(as_legacy_transaction).lower()
+        quote_url = self.ENDPOINT_APIS_URL['QUOTE'] + "inputMint=" + input_mint + "&outputMint=" + output_mint + "&amount=" + str(amount) + "&swapMode=" + swap_mode + "&onlyDirectRoutes=" + str(only_direct_routes).lower() + "&asLegacyTransaction=" + str(as_legacy_transaction).lower() + "&platformFeeBps=" + str(playform_fees)
         if slippage_bps:
             quote_url += "&slippageBps=" + str(slippage_bps)
         if exclude_dexes:
@@ -642,7 +643,9 @@ class Jupiter():
         only_direct_routes: bool=False,
         as_legacy_transaction: bool=False,
         exclude_dexes: list=None,
-        max_accounts: int=None
+        max_accounts: int=None,
+        playform_fees: int=None,
+        fee_account: str=None,
     ) -> str:
         """Perform a swap.
         
@@ -690,7 +693,8 @@ class Jupiter():
         transaction_parameters = {
             "quoteResponse": quoteResponse,
             "userPublicKey": self.keypair.pubkey().__str__(),
-            "wrapAndUnwrapSol": wrap_unwrap_sol
+            "wrapAndUnwrapSol": wrap_unwrap_sol,
+            "feeAccount": fee_account,
         }
         transaction_data = httpx.post(url=self.ENDPOINT_APIS_URL['SWAP'], json=transaction_parameters).json()
         return transaction_data['swapTransaction']
